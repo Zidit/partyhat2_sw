@@ -1,0 +1,199 @@
+/*
+===============================================================================
+ Name        : Partyhat.c
+ Author      : $(author)
+ Version     :
+ Copyright   : $(copyright)
+ Description : main definition
+===============================================================================
+*/
+
+#include "nvm.h"
+#include "sine.h"
+#include "chip.h"
+#include "serial.h"
+#include "printf.h"
+#include "ws2812.h"
+#include "editor.h"
+#include "config.h"
+#include "ubasic/ubasic.h"
+
+
+volatile unsigned int time = 0;
+
+#ifndef elements
+#define elements(x) (sizeof(x) / sizeof(x[0]))
+#endif
+
+void SysTick_Handler(void)
+{
+    time++;
+    if((time % 100) == 0) {
+    	Chip_GPIO_SetPortToggle(LPC_GPIO_PORT, 0, 10);
+    }
+}
+
+VARIABLE_TYPE peek(VARIABLE_TYPE arg)
+{
+	if(arg >= 0 && arg <= sizeof(strip)) {
+		return *((char*)strip + arg);
+	}
+	return 0;
+}
+
+void poke(VARIABLE_TYPE arg, VARIABLE_TYPE value)
+{
+	if(arg >= 0 && arg <= sizeof(strip)) {
+		*((char*)strip + arg) = value;
+	}
+}
+
+int run_editor(int cur_prog)
+{
+	Chip_SWM_MovablePinAssign(SWM_U0_TXD_O, 4);
+	clear_data();
+	send_strip_data(sizeof(strip));
+	return editor(cur_prog);
+}
+
+int main(void)
+{
+    // Read clock settings and update SystemCoreClock variable
+    SystemCoreClockUpdate();
+    Chip_SWM_Init();
+    Chip_GPIO_Init(LPC_GPIO_PORT);
+    Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_IOCON);
+    Chip_Clock_SetIOCONCLKDIV(IOCONCLKDIV0, 255);
+
+    //Strip output
+    Chip_SWM_DisableFixedPin(SWM_FIXED_I2C0_SCL);
+    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, 10);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO10,  PIN_MODE_INACTIVE);
+
+    //Setup buttons
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 4);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 12);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO4,  PIN_MODE_INACTIVE);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO12, PIN_MODE_INACTIVE);
+
+    //Setup ext
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 6);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 7);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 14);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 22);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO6, PIN_MODE_INACTIVE);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO7, PIN_MODE_INACTIVE);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO14, PIN_MODE_INACTIVE);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO22, PIN_MODE_INACTIVE);
+
+    //Setup led
+    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, 23);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, 10, false);
+
+    //Setup uart
+	//Chip_SWM_MovablePinAssign(SWM_U0_TXD_O, 4);
+	Chip_SWM_MovablePinAssign(SWM_U0_RXD_I, 0);
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO0,  PIN_MODE_REPEATER);
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO4,  PIN_MODE_INACTIVE);
+    serial_init();
+    serial_set_baud(115200);
+
+    //Set unused pins to output and low
+    static const char unused[] = {1,8,9,11,13,15,16,17,18,19,20,21,24,25,26,27,28};
+    static const char unused_icon[] = {IOCON_PIO1, IOCON_PIO8, IOCON_PIO9, IOCON_PIO11,
+    		IOCON_PIO13, IOCON_PIO15, IOCON_PIO16, IOCON_PIO17, IOCON_PIO18, IOCON_PIO19,
+			IOCON_PIO20, IOCON_PIO21, IOCON_PIO24, IOCON_PIO25, IOCON_PIO26, IOCON_PIO27, IOCON_PIO28};
+    int i;
+    for(i = 0; i < elements(unused); i++) {
+    	Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, unused[i]);
+    	Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, unused[i], false);
+    	Chip_IOCON_PinSetMode(LPC_IOCON, unused_icon[i],  PIN_MODE_INACTIVE);
+    }
+
+    __enable_irq();
+
+	/* Enable SysTick Timer */
+    SysTick_Config(SystemCoreClock / 1000);
+
+    if(program_number > 7)
+    	program_number = 5;
+	if(brightness > 4)
+		brightness = 4;
+
+	brightness = 4;
+
+    while(1){
+		printf("\033[2J");
+		printf("\033[H");
+		printf("Running: %i\n", program_number + 1);
+		printf("Press 'e' for editor or 1-8 to change program");
+
+		ubasic_init_peek_poke(get_file_ptr(program_number), &peek, &poke);
+
+		clear_data();
+		send_strip_data(300);
+
+		do {
+			ubasic_run();
+
+			static bool was_down = false;
+			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, 12)){
+				if(!was_down){
+					was_down = true;
+					program_number++;
+					if(program_number > 7)
+						program_number = 0;
+					break;
+				}
+			} else {
+				was_down = false;
+			}
+
+			static bool was_down2 = false;
+			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, 4)){
+				if(!was_down2){
+					was_down2 = true;
+					brightness ++;
+					if(brightness > 4)
+						brightness = 1;
+				}
+			} else {
+				was_down2 = false;
+			}
+
+			if(serial_data_available())
+			{
+				printf("Program terminated.");
+				while(!serial_data_available());
+
+				char c = serial_get_char();
+				if(c >= '1' && c <= '8'){
+					program_number = c - '1';
+					break;
+				} else if (c == 'e') {
+					while(serial_data_available())
+						serial_get_char();
+
+					program_number = run_editor(program_number);
+					break;
+				} else if(c == 'z'){
+					brightness = 1;
+				} else if(c == 'x'){
+					brightness = 2;
+				} else if(c == 'c'){
+					brightness = 3;
+				} else if(c == 'v'){
+					brightness = 4;
+				}
+
+			}
+
+		} while(!ubasic_finished());
+    }
+}
+
+
+
+
+
+
