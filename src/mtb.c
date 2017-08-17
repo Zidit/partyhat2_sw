@@ -66,7 +66,7 @@
   // Check that buffer size requested is >0 bytes in size
   #if (__MTB_BUFFER_SIZE > 0)
     // Pull in MTB related macros
-    #include <cr_mtb_buffer.h>
+    #include "cr_mtb_buffer.h"
 
     // Check if MYTB buffer is to be placed in specific RAM bank
     #if defined(__MTB_RAM_BANK)

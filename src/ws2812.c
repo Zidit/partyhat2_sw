@@ -42,14 +42,19 @@ void send_strip_data(uint32_t size)
 
 	atomic() {
 	asm volatile(
-			".syntax unified		\n\t"
-			"ldr    r2, =#0xA0001028 \n\t"
+
+			".syntax unified \n\t"
+
+			"ldr    r2, =#0xA0001028   \n\t"
 			"movs   r0, #0 			\n\t"
+
 
 			"loop_array:"
 
 			"ldrb   r3, [%[ptr]] 	\n\t"
-			"muls   r3, %[bri], r3 	\n\t"	// Brightness control
+
+			"mov    r1, %[bri]		\n\t"
+			"muls   r3, r1, r3 		\n\t"	// Brightness control
 			"lsrs   r3, #2		 	\n\t"	// Brightness control
 			"add	r3, %[gam]		\n\t"	// "Gamma" correction
 			"ldrb   r3, [r3] 		\n\t"	// "Gamma" correction

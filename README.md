@@ -4,11 +4,19 @@ Partyhat 2 is programmable a neopixel driver based on LPC824 micro controller. I
 
 The hardware for the project is in partyhat_hw repo.
 
-## Programing 
+## Building and flashing
 
-The firmaware can be programed with LPC's bootloader over serial port. To program use lpcprog.py included in the project. Expample: 'python lpcprog.py -p com1 Partyhat.bin' or 'python lpcprog.py -p /dev/ttyUSB0 Partyhat.bin'
+1. Run: make all
+You might need to install arm-none-aebi-gcc and arm-none-aebi-newlib packages.
 
-You can use the precompiled binary or compile using LPCxpresso IDE. (TODO: independent makefile).
+2. Connect the board to serial port. Keep both buttons down when connecting the power to enter the ISP bootloader.
+
+3. Run: make program 
+Change the port from the make file if needed.
+
+or
+
+Run: make bin && python lpcprog.py -p /dev/ttyUSB0 ./build/flash.bin
 
 ## Editor
 
