@@ -43,7 +43,9 @@ void send_strip_data(uint32_t size)
 	atomic() {
 	asm volatile(
 
+			".thumb\n\t"
 			".syntax unified \n\t"
+			".cpu cortex-m0plus \n\t"
 
 			"ldr    r2, =#0xA0001028   \n\t"
 			"movs   r0, #0 			\n\t"
