@@ -21,8 +21,8 @@ SOFTWARE.
  */
 
 
-#include "ctype.h"
 #include "printf.h"
+#include "stdlib.h"
 
 #define FLAG_LEFT_JUST		(1 << 0)
 #define FLAG_FORCE_SIGN		(1 << 1)
@@ -46,23 +46,6 @@ struct sub_specifiers {
 	int p;
 };
 
-
-void* memset(void* ptr, int value, int size)
-{
-	while(size--)
-		*((unsigned char*)ptr + size) = value;
-	return ptr;
-}
-
-char* strcpy(char *dest, const char *src)
-{
-	char* org = dest;
-	while(*src)
-		*(dest++) = *(src++);
-	*(dest) = *(src);
-	return org;
-}
-
 char* strapp(char *dest, const char *src)
 {
 	while(*src)
@@ -76,55 +59,6 @@ char* strapp(char *dest, const char *src)
 	  __typeof__ (b) _b = (b); \
 	  _a < _b ? _a : _b;})
 
-static int num_to_int(const char* str, int *value)
-{
-	int i = 0;
-	*value = 0;
-
-	while(str[i] >= '0' && str[i] <= '9') {
-		*value *= 10;
-		*value += str[i++] - '0';
-	}
-
-	return i;
-}
-
-static char* int_to_num(char* buf, unsigned int value, int base, int ucase)
-{
-	int i = 0;
-	buf[i++] = '\0';
-
-	if(value == 0) {
-		buf[i++] = '0';
-	} else {
-		while(value) {
-			int digit = (value % base);
-			buf[i++] = digit < 10 ? ('0' + digit) : (ucase ? 'A' : 'a') + digit - 10;
-			value /= base;
-		}
-	}
-	i--;
-
-	//reverse string
-	int j = 0;
-	while(j < i) {
-		char c = buf[j];
-		buf[j] = buf[i];
-		buf[i] = c;
-		i--;
-		j++;
-	}
-
-	return buf;
-}
-
-static int _strlen(char* str)
-{
-	int i = 0;
-	while(*(str++))
-		i++;
-	return i;
-}
 
 static int get_flags(const char* stream, int* chars_got)
 {
@@ -242,9 +176,9 @@ static int print_with_padding(char* value, char* sign, struct sub_specifiers *ss
 	int chars_printed = 0;
 	int left_pad = 0;
 	if(!(ss->f & FLAG_LEFT_JUST)) {
-		left_pad = ss->w - (ss->p > _strlen(value) ? ss->p : _strlen(value));
+		left_pad = ss->w - (ss->p > strlen(value) ? ss->p : strlen(value));
 		if(sign[0])
-			left_pad -= _strlen(sign);
+			left_pad -= strlen(sign);
 		if(left_pad < 0)
 			left_pad = 0;
 
@@ -257,7 +191,7 @@ static int print_with_padding(char* value, char* sign, struct sub_specifiers *ss
 	if(ss->f & FLAG_PAD_ZERO)
 		chars_printed += printchars('0', left_pad, strm);
 
-	chars_printed += printchars('0', ss->p - _strlen(value), strm);
+	chars_printed += printchars('0', ss->p - strlen(value), strm);
 	chars_printed += printstr(value, strm);
 
 	if(ss->f & FLAG_LEFT_JUST)
@@ -362,7 +296,7 @@ static int print_string(char* string, struct sub_specifiers *ss, struct stream *
 
 	int chars_printed = 0;
 	int left_pad = 0;
-	int string_len = _strlen(string);
+	int string_len = strlen(string);
 	if(ss->p > 0)
 		string_len = (string_len < ss->p) ? string_len : ss->p;
 

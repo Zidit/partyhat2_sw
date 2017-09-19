@@ -15,6 +15,7 @@ printf.c \
 ring_buffer.c \
 serial.c \
 sine.c \
+stdlib.c \
 sysinit.c \
 ws2812.c \
 ubasic/tokenizer.c \
@@ -65,7 +66,7 @@ LIBDIR = $(BASEDIR)
 # Flags for above programs when calling them from the command line
 
 CFLAGS = -DDEBUG -D__CODE_RED -DCORE_M0PLUS -D__USE_ROMDIVIDE -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC82X__ -g3 -mcpu=cortex-m0plus -march=armv6-m -mthumb -Og 
-LDFLAGS = -Xlinker -Map="$(BUILDDIR)/Partyhat.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -mcpu=cortex-m0plus -march=armv6-m  -T "configurations.ld"
+LDFLAGS = -Xlinker -Map="$(BUILDDIR)/Partyhat.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -nostdlib -mcpu=cortex-m0plus -march=armv6-m  -T "configurations.ld"
 LDLIBS := -Wl,-lgcc $(addprefix -l,$(LDLIBS))
 
 # Programs to use for creating dependencies, compiling source files, and creating the library file, respectively

@@ -27,7 +27,6 @@
  * SUCH DAMAGE.
  *
  */
-//#include <stdio.h>
 
 
 
@@ -38,9 +37,8 @@
 #endif
 
 #include "tokenizer.h"
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include "../stdlib.h"
+
 
 static char const *ptr, *nextptr;
 
