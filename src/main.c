@@ -148,7 +148,7 @@ int main(void)
 	/* Enable SysTick Timer */
     SysTick_Config(SystemCoreClock / 1000);
 
-    if(program_number > 7)
+    if(program_number > 6)
     	program_number = 5;
 	if(brightness > 4)
 		brightness = 4;
@@ -174,7 +174,7 @@ int main(void)
 				if(!was_down){
 					was_down = true;
 					program_number++;
-					if(program_number > 7)
+					if(program_number > 6)
 						program_number = 0;
 					break;
 				}
@@ -200,7 +200,7 @@ int main(void)
 				while(!serial_data_available());
 
 				char c = serial_get_char();
-				if(c >= '1' && c <= '8'){
+				if(c >= '1' && c <= '7'){
 					program_number = c - '1';
 					break;
 				} else if (c == 'e') {
