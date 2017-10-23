@@ -226,11 +226,12 @@ int editor(int sector)
 {
 	int current = sector;
 	load_file(sector, buffer);
-	full_refresh();
 
 	cursor_x = 1;
 	cursor_y = 1;
 	file_modified = false;
+	
+	full_refresh();	
 
 	while(1)
 	{
