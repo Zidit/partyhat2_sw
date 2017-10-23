@@ -18,12 +18,28 @@
 #include "config.h"
 #include "ubasic/ubasic.h"
 
+#define Rev2
+
+#define PIN_LED		22
+#define PIN_STRIP	10
+#define PIN_PROG	12
+#define PIN_BRIGHT	23
 
 volatile unsigned int time = 0;
 
 #ifndef elements
 #define elements(x) (sizeof(x) / sizeof(x[0]))
 #endif
+
+
+
+static uint8_t icon_lut[] = {
+	IOCON_PIO0, IOCON_PIO1, IOCON_PIO2, IOCON_PIO3, IOCON_PIO4, IOCON_PIO5,
+	IOCON_PIO6, IOCON_PIO7, IOCON_PIO8, IOCON_PIO9, IOCON_PIO10, IOCON_PIO11, 
+	IOCON_PIO12, IOCON_PIO13, IOCON_PIO14, IOCON_PIO15, IOCON_PIO16, IOCON_PIO17, 
+	IOCON_PIO18, IOCON_PIO19, IOCON_PIO20, IOCON_PIO21, IOCON_PIO22, IOCON_PIO23,
+	IOCON_PIO24, IOCON_PIO25, IOCON_PIO26, IOCON_PIO27, IOCON_PIO28,  
+};
 
 void SysTick_Handler(void)
 {
@@ -67,16 +83,29 @@ int main(void)
 
     //Strip output
     Chip_SWM_DisableFixedPin(SWM_FIXED_I2C0_SCL);
-    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, 10);
-    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO10,  PIN_MODE_INACTIVE);
+    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, PIN_STRIP);
+    Chip_IOCON_PinSetMode(LPC_IOCON, icon_lut[PIN_STRIP],  PIN_MODE_INACTIVE);
 
-    //Setup buttons
+	//Setup buttons
+	#ifdef Rev2
+	Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, PIN_BRIGHT);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, PIN_PROG);
+    Chip_IOCON_PinSetMode(LPC_IOCON, icon_lut[PIN_BRIGHT], PIN_MODE_INACTIVE);
+	Chip_IOCON_PinSetMode(LPC_IOCON, icon_lut[PIN_PROG], PIN_MODE_INACTIVE);
+	#elif
     Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 4);
     Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 12);
     Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO4,  PIN_MODE_INACTIVE);
-    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO12, PIN_MODE_INACTIVE);
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO12, PIN_MODE_INACTIVE);
+	#endif
 
-    //Setup ext
+	//Setup ext
+	#ifdef Rev2
+	Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 9);
+    Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 14);
+    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO9, PIN_MODE_PULLUP);
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO14, PIN_MODE_PULLUP);
+	#elif
     Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 6);
     Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 7);
     Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 14);
@@ -84,14 +113,17 @@ int main(void)
     Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO6, PIN_MODE_INACTIVE);
     Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO7, PIN_MODE_INACTIVE);
     Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO14, PIN_MODE_INACTIVE);
-    Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO22, PIN_MODE_INACTIVE);
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO22, PIN_MODE_INACTIVE);
+	#endif
 
     //Setup led
-    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, 23);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, 10, false);
+    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, PIN_LED);
+	Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, PIN_LED, false);
+	Chip_IOCON_PinSetMode(LPC_IOCON, icon_lut[PIN_LED], PIN_MODE_INACTIVE);
+
 
     //Setup uart
-	//Chip_SWM_MovablePinAssign(SWM_U0_TXD_O, 4);
+	Chip_SWM_MovablePinAssign(SWM_U0_TXD_O, 4);
 	Chip_SWM_MovablePinAssign(SWM_U0_RXD_I, 0);
 	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO0,  PIN_MODE_REPEATER);
 	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO4,  PIN_MODE_INACTIVE);
@@ -99,15 +131,16 @@ int main(void)
     serial_set_baud(115200);
 
     //Set unused pins to output and low
-    static const char unused[] = {1,8,9,11,13,15,16,17,18,19,20,21,24,25,26,27,28};
-    static const char unused_icon[] = {IOCON_PIO1, IOCON_PIO8, IOCON_PIO9, IOCON_PIO11,
-    		IOCON_PIO13, IOCON_PIO15, IOCON_PIO16, IOCON_PIO17, IOCON_PIO18, IOCON_PIO19,
-			IOCON_PIO20, IOCON_PIO21, IOCON_PIO24, IOCON_PIO25, IOCON_PIO26, IOCON_PIO27, IOCON_PIO28};
+	#ifdef Rev2
+	static const char unused[] = {1,6,7,8,11,13,15,16,17,18,19,20,21,24,25,26,28};
+	#elif
+	static const char unused[] = {1,8,9,11,13,15,16,17,18,19,20,21,24,25,26,27,28};
+	#endif
     int i;
     for(i = 0; i < elements(unused); i++) {
     	Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, unused[i]);
     	Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, unused[i], false);
-    	Chip_IOCON_PinSetMode(LPC_IOCON, unused_icon[i],  PIN_MODE_INACTIVE);
+    	Chip_IOCON_PinSetMode(LPC_IOCON, icon_lut[unused[i]],  PIN_MODE_INACTIVE);
     }
 
     __enable_irq();
@@ -137,7 +170,7 @@ int main(void)
 			ubasic_run();
 
 			static bool was_down = false;
-			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, 12)){
+			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, PIN_PROG)){
 				if(!was_down){
 					was_down = true;
 					program_number++;
@@ -150,7 +183,7 @@ int main(void)
 			}
 
 			static bool was_down2 = false;
-			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, 4)){
+			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, PIN_BRIGHT)){
 				if(!was_down2){
 					was_down2 = true;
 					brightness ++;
