@@ -60,7 +60,9 @@ VARIABLE_TYPE peek(VARIABLE_TYPE arg)
 void poke(VARIABLE_TYPE arg, VARIABLE_TYPE value)
 {
 	if(arg >= 0 && arg <= sizeof(strip)) {
-		*((char*)strip + arg) = value;
+		value = value > 255 ? 255 : value;
+		value = value < 0 ? 0 : value;
+		*((uint8_t*)strip + arg) = value;
 	}
 }
 
@@ -154,6 +156,7 @@ int main(void)
 		brightness = 4;
 
 	brightness = 4;
+	program_number = 2;
 
     while(1){
 		printf("\033[2J");
