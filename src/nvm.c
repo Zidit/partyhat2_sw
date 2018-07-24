@@ -50,7 +50,7 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "290 next i\n"
 "300 return\n",
 
-"10 let l = 60\n"
+"10 peek 1000, l\n"
 "20 for a = 0 to 270\n"
 "30 poke a, rnd % 255\n"
 "40 next a\n"
@@ -126,7 +126,7 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "30 for i = 0 to s\n"
 "40 gosub 200\n"
 "50 poke i * 3 + 1, 255\n"
-"60 update l\n"
+"60 update l\n" 
 "70 sleep 50\n"
 "80 next i\n"
 "100 for j = 0 to s\n"
@@ -145,7 +145,9 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "260 return\n",
 */
 
-"leds=60\n"
+"LEDS : 60\n"
+"PROG : 3\n"
+"BRI : 2\n"
 ,
 
 };
