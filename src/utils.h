@@ -30,4 +30,8 @@
 		   _value < _min ? _min : (_value > _max ? _max : _value) ; })
 #endif
 
+#ifndef elements
+#define elements(x) (sizeof(x) / sizeof(x[0]))
+#endif
+
 #endif /* UTILS_H_ */

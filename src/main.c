@@ -16,6 +16,7 @@
 #include "ws2812.h"
 #include "editor.h"
 #include "config.h"
+#include "utils.h"
 #include "ubasic/ubasic.h"
 
 #define Rev2
@@ -26,10 +27,6 @@
 #define PIN_BRIGHT	23
 
 volatile unsigned int time = 0;
-
-#ifndef elements
-#define elements(x) (sizeof(x) / sizeof(x[0]))
-#endif
 
 
 
