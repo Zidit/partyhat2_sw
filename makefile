@@ -7,6 +7,7 @@ TARGETNAME = flash
 SRC = \
 cr_startup_lpc82x.c \
 crp.c \
+config.c \
 editor.c \
 main.c \
 mtb.c \

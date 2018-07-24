@@ -16,4 +16,10 @@
 #define program_number	(GPREG0)
 #define brightness 		(GPREG1)
 
+extern unsigned int cfg_led_count;
+extern unsigned int cfg_brightness;
+extern unsigned int cfg_program;
+
+void config_load();
+
 #endif /* CONFIG_H_ */
