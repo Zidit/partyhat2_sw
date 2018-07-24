@@ -214,7 +214,7 @@ int main(void)
 					while(serial_data_available())
 						serial_get_char();
 
-					program_number = run_editor(program_number);
+					run_editor(program_number);
 					break;
 				} else if(c == 'z'){
 					brightness = 1;
