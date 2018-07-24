@@ -121,6 +121,9 @@ char* int_to_num(char* buf, unsigned int value, int base, int ucase)
 
 int atoi(const char* str)
 {
+	while(*str && isspace(*str))
+		str++;
+
 	int value;
 	num_to_int(str, &value);
 	return value;
