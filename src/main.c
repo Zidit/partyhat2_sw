@@ -163,10 +163,8 @@ int main(void)
 	program_number = cfg_program;
 
     while(1){
-		printf("\033[2J");
-		printf("\033[H");
 		printf("Running: %i\n", program_number + 1);
-		printf("Press 'e' for editor or 1-8 to change program");
+		printf("Press 'e' for editor or 1-7 to change program\n");
 
 		ubasic_init_peek_poke(get_file_ptr(program_number), &peek, &poke);
 
@@ -203,7 +201,7 @@ int main(void)
 
 			if(serial_data_available())
 			{
-				printf("Program terminated.");
+				printf("Program terminated\n");
 				while(!serial_data_available());
 
 				char c = serial_get_char();
@@ -215,6 +213,8 @@ int main(void)
 						serial_get_char();
 
 					run_editor(program_number);
+					printf("\033[2J");
+					printf("\033[H");
 					break;
 				} else if(c == 'z'){
 					brightness = 1;
