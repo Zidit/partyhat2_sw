@@ -301,8 +301,8 @@ int editor(int sector)
 			printf("-Use peek(get) and poke(set) modify led buffer.\n");
 			printf(" Addresses are from 0 to 900 in following order:\n");
 			printf(" 0 = 0g, 1 = 0r, 2 = 0b, 3 = 1g, 4 = 1r, ... 898 = 299r, 899 = 299b\n");
-			printf("-Use peek adress >1000 to get configs. Edit configs in page 7\n");
-			printf(" Addr 1000: strip length\n");
+			printf("-Use peek address >1000 to get configs. Edit configs in page 8\n");
+			printf(" Address 1000: strip length\n");
 			printf("-Use clr to sets led buffer to 0.\n");
 			printf("-Use update [leds] to write led buffer to the strip.\n");
 			printf(" [led] is number of leds to update (usually length of the strip).\n");
