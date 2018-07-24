@@ -55,6 +55,16 @@ char* strcpy(char *dest, const char *src)
 	return org;
 }
 
+int strcmp (const char* str1, const char* str2)
+{
+	while(*str1 && *str2 && *(str1) == *(str2)) {
+		str1++;
+		str2++;
+	}
+
+	return *str1 - *str2;
+}
+
 int strncmp (const char* str1, const char* str2, size_t num)
 {
 	while(num-- && *str1 && *str2 && *(str1) == *(str2)) {
@@ -122,4 +132,65 @@ int isdigit(int c)
 		return 1;
 	else
 		return 0;
+}
+
+int isspace(int c)
+{
+	if(c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r')
+		return c;
+	else
+		return 0;
+}
+
+int toupper(int c)
+{
+	if(c >= 'a' && c <= 'z')
+		return c - 32;
+	else
+		return c; 
+}
+
+const char* strchr(const char* str, int character)
+{
+	while(*str++){
+		if(*str == character)
+			return str;
+	}
+
+	return NULL;
+}
+
+char* strpbrk(char* str1, const char* str2)
+{
+	int pos;
+	while(*str1++){
+		pos = 0;
+		while(*(str2 + pos))
+			if(*(str2 + pos++) == *str1)
+				return str1;
+	}
+
+	return NULL;
+}
+
+char* strtok_r(char* str, const char* delimiters, char **saveptr)
+{
+	if(str)
+		*saveptr = str;
+
+	char* start_pos = *saveptr;
+	char* new_pos = strpbrk(start_pos, delimiters);
+
+	if(new_pos == NULL || *new_pos == '\0')
+		return NULL;
+
+	*new_pos = '\0';
+	*saveptr = new_pos + 1;
+	return start_pos;	
+}
+
+char* strtok(char* str, const char* delimiters)
+{
+	static char* saveptr;
+	return strtok_r(str, delimiters, &saveptr);
 }
