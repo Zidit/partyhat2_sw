@@ -50,7 +50,10 @@ VARIABLE_TYPE peek(VARIABLE_TYPE arg)
 {
 	if(arg >= 0 && arg <= sizeof(strip)) {
 		return *((char*)strip + arg);
+	} else if (arg == 1000) {
+		return cfg_led_count;
 	}
+	
 	return 0;
 }
 
@@ -146,7 +149,7 @@ int main(void)
 
 	/* Enable SysTick Timer */
     SysTick_Config(SystemCoreClock / 1000);
-
+/*
     if(program_number > 6)
     	program_number = 5;
 	if(brightness > 4)
@@ -154,6 +157,10 @@ int main(void)
 
 	brightness = 4;
 	program_number = 2;
+*/
+	config_load();
+	brightness = cfg_brightness;
+	program_number = cfg_program;
 
     while(1){
 		printf("\033[2J");
@@ -217,6 +224,9 @@ int main(void)
 					brightness = 3;
 				} else if(c == 'v'){
 					brightness = 4;
+				} else if(c == 'l'){
+					config_load();
+					break;
 				}
 
 			}
