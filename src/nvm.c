@@ -13,25 +13,25 @@
 char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) =
 {
 
-"10 let l = 60\n"
+"10 peek 1000, l\n"
 "20 let r = 0\n"
 "30 let g = 0\n"
 "40 let b = 0\n"
 "50 clr\n"
 "60 for i = 0 to 31\n"
 "70 let s = (sin(4 * i) - 128) * 2\n"
-"80 poke ((r + i) * 3) % 270, s\n"
-"90 poke ((g + i) * 3) % 270 + 1, s\n"
-"100 poke ((b + i) * 3) % 270 + 2, s\n"
+"80 poke ((r + i) * 3) % (l*3), s\n"
+"90 poke ((g + i) * 3) % (l*3) + 1, s\n"
+"100 poke ((b + i) * 3) % (l*3) + 2, s\n"
 "110 next i\n"
 "120 let r = r + 1\n"
 "130 let g = g + 2\n"
 "140 let b = b + 3\n"
-"150 update 90\n"
+"150 update l\n"
 "160 sleep 20\n"
 "170 goto 50\n",
 
-"10 let l = 60\n"
+"10 peek 1000, l\n"
 "20 poke 0, (rnd % 255) / 3 + 128\n"
 "30 poke 1, (rnd % 255) / 3 + 128\n"
 "40 poke 2, (rnd % 255) / 3 + 128\n"
@@ -51,13 +51,13 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "300 return\n",
 
 "10 peek 1000, l\n"
-"20 for a = 0 to 270\n"
+"20 for a = 0 to l\n"
 "30 poke a, rnd % 255\n"
 "40 next a\n"
 "50 update l\n"
 "70 goto 20\n",
 
-"10 let l = 60\n"
+"10 peek 1000, l\n"
 "20 let a = 0\n"
 "30 let b = 0\n"
 "40 let c = 0\n"
@@ -80,7 +80,7 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 
 
 
-"10 let l = 90\n"
+"10 peek 1000, l\n"
 "20 let c = 0\n"
 "30 let c = c + 1\n"
 "40 if c = 3 then let c = 0\n"
@@ -89,6 +89,7 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "70 let a = a + 3\n"
 "80 if a > 270 then goto 110\n"
 "90 update l\n"
+"95 sleep 1\n"
 "100 goto 60\n"
 "110 let a = c\n"
 "120 poke a, 0\n"
@@ -99,7 +100,7 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 
 
 
-"10 let l = 90\n"
+"10 peek 1000, l\n"
 "20 let r = 1\n"
 "30 let g = 0\n"
 "40 let b = 2\n"
@@ -107,9 +108,9 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 "60 poke r, 128\n"
 "70 poke g, 128\n"
 "80 poke b, 128\n"
-"90 let r = (r + 1 * 3) % 270\n"
-"100 let g = (g + 2 * 3) % 270\n"
-"110 let b = (b + 3 * 3) % 270\n"
+"90 let r = (r + 1 * 3) % (l*3)\n"
+"100 let g = (g + 2 * 3) % (l*3)\n"
+"110 let b = (b + 3 * 3) % (l*3)\n"
 "120 for i = 0 to 2\n"
 "130 update l\n"
 "140 next i\n"
