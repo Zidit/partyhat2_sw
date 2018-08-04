@@ -306,7 +306,7 @@ int editor(int sector)
 			printf("-Use clr to sets led buffer to 0.\n");
 			printf("-Use update [leds] to write led buffer to the strip.\n");
 			printf(" [led] is number of leds to update (usually length of the strip).\n");
-			printf("-Use rnd as variable to get random 32-bit number.\n");
+			printf("-Use rnd as variable to get random unsigned 32-bit number.\n");
 			printf("-Use sin([angle]) to get sine. Angle is between 0 and 255.\n");
 			printf(" Return value is between -128 and 127.\n");
 

@@ -77,10 +77,12 @@ void exit(int i)
 	ended = 1;
 }
 
-int random()
+unsigned int random()
 {
 	static int x = 0;
 	x = 1103515245 * x + 12345;
+  if(x < 0)
+    x = -x;
 	return x;
 }
 
