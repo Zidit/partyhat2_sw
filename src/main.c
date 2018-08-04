@@ -171,8 +171,15 @@ int main(void)
 		clear_data();
 		send_strip_data(300);
 
-		do {
+		while(1) {
 			ubasic_run();
+
+			//Check if there was a problem running the basic code
+			int finished = ubasic_finished();
+			if(finished < 0) {
+				printf("Press 'e' for editor or 1-7 to change program\n");
+				while(!serial_data_available());
+			}
 
 			static bool was_down = false;
 			if(!Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, PIN_PROG)){
@@ -232,11 +239,12 @@ int main(void)
 					config_load();
 					printf("\033[2J");
 					printf("\033[H");
+					break;
 				}
 
 			}
 
-		} while(!ubasic_finished());
+		}
     }
 }
 

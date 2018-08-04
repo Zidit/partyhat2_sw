@@ -74,7 +74,7 @@ static int ended;
 
 void exit(int i)
 {
-	ended = 1;
+	ended = i;
 }
 
 unsigned int random()
@@ -120,7 +120,8 @@ accept(int token)
     printf("Token on line %i not what was expected (expected %s, got %s)\n",
     		current_line, tok_to_str(token), tok_to_str(tokenizer_token()));
     tokenizer_error_print();
-    exit(1);
+    exit(-1);
+    return;
   }
   DEBUG_PRINTF("Expected %s, got it\n", tok_to_str(token));
   tokenizer_next();
@@ -483,7 +484,7 @@ static void
 end_statement(void)
 {
   accept(TOKENIZER_END);
-  ended = 1;
+  exit(1);
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -569,7 +570,7 @@ statement(void)
     break;
   default:
     DEBUG_PRINTF("ubasic.c: statement(): not implemented %d\n", token);
-    exit(1);
+    exit(-2);
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -587,7 +588,7 @@ line_statement(void)
 void
 ubasic_run(void)
 {
-  if(tokenizer_finished()) {
+  if(tokenizer_finished() || ended) {
     DEBUG_PRINTF("uBASIC program finished\n");
     return;
   }
@@ -598,7 +599,10 @@ ubasic_run(void)
 int
 ubasic_finished(void)
 {
-  return ended || tokenizer_finished();
+  if(tokenizer_finished())
+    return -3;
+
+  return ended;
 }
 /*---------------------------------------------------------------------------*/
 void
