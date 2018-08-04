@@ -156,8 +156,8 @@ char nvm_buffer[8][1024] __attribute__((aligned(256), section(".text_Flash2"))) 
 */
 
 "LEDS : 60\n"
-"PROG : 3\n"
-"BRI : 2\n"
+"PROG : 1\n"
+"BRI : 1\n"
 ,
 
 };
