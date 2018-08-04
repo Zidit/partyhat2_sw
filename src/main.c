@@ -227,6 +227,11 @@ int main(void)
 				} else if(c == 'l'){
 					config_load();
 					break;
+				} else if (c == 's') {
+					run_editor(7);
+					config_load();
+					printf("\033[2J");
+					printf("\033[H");
 				}
 
 			}
